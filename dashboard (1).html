@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAFFRON — Manager Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #d4a017; --orange: #ff6b35;
+    --deep: #0a0705; --card: #110e09; --card2: #140f09;
+    --border: rgba(212,160,23,0.15); --text: #f0e6d3; --muted: #8c7a62;
+    --green: #2ecc71; --red: #e74c3c; --blue: #3498db; --yellow: orange;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--deep); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; }
+
+  /* AUTH GUARD */
+  #authGuard {
+    position: fixed; inset: 0; background: var(--deep);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; flex-direction: column; gap: 16px;
+  }
+  .auth-spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .auth-text { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 36px;
+    background: rgba(10,7,5,0.97);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-brand { font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 4px; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-user { font-size: 0.75rem; letter-spacing: 1px; color: var(--muted); }
+  .nav-user span { color: var(--gold); font-weight: 700; }
+  .logout-btn { padding: 7px 18px; background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--green); }
+  .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: livePulse 1.4s ease-in-out infinite; }
+  @keyframes livePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.5); } 50% { box-shadow: 0 0 0 7px rgba(46,204,113,0); } }
+
+  /* MAIN */
+  main { padding: 36px 36px; max-width: 1400px; margin: 0 auto; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom: 36px; }
+  .page-header .tag { font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .page-header .tag::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; }
+  .page-header h1 em { font-style: italic; color: var(--gold); }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 36px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); padding: 20px 22px; position: relative; overflow: hidden; transition: all 0.3s; }
+  .stat-card::after { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--gold), var(--orange)); }
+  .stat-card:hover { border-color: rgba(212,160,23,0.3); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .stat-label { font-size: 0.62rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+  .stat-sub { font-size: 0.72rem; color: var(--muted); margin-top: 5px; }
+  .stat-card.green .stat-value { background: linear-gradient(135deg, var(--green), #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card.green::after { background: linear-gradient(180deg, var(--green), #27ae60); }
+  .stat-card.red .stat-value { background: linear-gradient(135deg, var(--red), #c0392b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card.red::after { background: linear-gradient(180deg, var(--red), #c0392b); }
+  .stat-card.blue .stat-value { background: linear-gradient(135deg, var(--blue), #2980b9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card.blue::after { background: linear-gradient(180deg, var(--blue), #2980b9); }
+
+  /* FILTER TABS */
+  .filter-tabs { display: flex; gap: 0; border: 1px solid var(--border); width: fit-content; margin-bottom: 24px; overflow: hidden; }
+  .ftab { padding: 10px 22px; background: none; border: none; border-right: 1px solid var(--border); color: var(--muted); font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .ftab:last-child { border-right: none; }
+  .ftab.active { color: var(--gold); background: rgba(212,160,23,0.08); }
+  .ftab:hover:not(.active) { color: var(--text); }
+  .ftab-count { display: inline-block; margin-left: 6px; background: var(--border); padding: 1px 6px; border-radius: 20px; font-size: 0.65rem; }
+  .ftab.active .ftab-count { background: var(--gold); color: var(--deep); }
+
+  /* ORDERS AREA */
+  .orders-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .orders-header h2 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+  .refresh-btn { padding: 7px 18px; background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'Rajdhani', sans-serif; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ORDER CARD GRID */
+  .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; }
+  .order-card {
+    background: var(--card); border: 1px solid var(--border);
+    overflow: hidden; transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    animation: cardIn 0.45s cubic-bezier(0.16,1,0.3,1) both;
+    position: relative;
+  }
+  @keyframes cardIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .order-card:hover { border-color: rgba(212,160,23,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateY(-3px); }
+  .order-card.status-new { border-left: 3px solid var(--green); }
+  .order-card.status-preparing { border-left: 3px solid var(--yellow); }
+  .order-card.status-ready { border-left: 3px solid var(--blue); }
+  .order-card.status-approved { border-left: 3px solid var(--green); }
+  .order-card.status-rejected { border-left: 3px solid var(--red); opacity: 0.65; }
+  .order-card.status-delivered { border-left: 3px solid var(--muted); opacity: 0.7; }
+  .order-card.status-returned { border-left: 3px solid var(--red); opacity: 0.7; }
+  .order-card.new-flash { animation: cardFlash 1.5s ease; }
+  @keyframes cardFlash { 0%,100%{background:var(--card);} 30%{background:rgba(46,204,113,0.08);} }
+
+  /* CARD HEADER */
+  .card-head { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+  .order-id { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--gold); font-weight: 700; }
+  .order-time { font-size: 0.68rem; color: var(--muted); letter-spacing: 1px; }
+  .status-pill { padding: 3px 12px; font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; border-radius: 20px; }
+  .pill-new { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .pill-preparing { background: rgba(255,165,0,0.12); color: orange; border: 1px solid rgba(255,165,0,0.25); }
+  .pill-ready { background: rgba(52,152,219,0.12); color: var(--blue); border: 1px solid rgba(52,152,219,0.25); }
+  .pill-approved { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
+  .pill-rejected { background: rgba(231,76,60,0.12); color: var(--red); border: 1px solid rgba(231,76,60,0.25); }
+  .pill-delivered { background: rgba(255,255,255,0.06); color: var(--muted); border: 1px solid var(--border); }
+  .pill-returned { background: rgba(231,76,60,0.12); color: var(--red); border: 1px solid rgba(231,76,60,0.25); }
+
+  /* CUSTOMER INFO */
+  .customer-row { padding: 14px 20px 0; display: flex; gap: 20px; align-items: flex-start; }
+  .customer-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, var(--gold), var(--orange)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: var(--deep); flex-shrink: 0; }
+  .customer-info { flex: 1; }
+  .customer-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+  .customer-meta { font-size: 0.72rem; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+  .customer-meta span { display: flex; align-items: center; gap: 4px; }
+  .order-type-badge { padding: 2px 10px; background: rgba(212,160,23,0.1); border: 1px solid var(--border); color: var(--gold); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; }
+
+  /* ITEMS LIST */
+  .items-section { padding: 16px 20px 0; }
+  .items-label { font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .items-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+  .items-scroll::-webkit-scrollbar { height: 2px; }
+  .items-scroll::-webkit-scrollbar-thumb { background: var(--gold); }
+  .item-chip { flex-shrink: 0; background: var(--card2); border: 1px solid var(--border); overflow: hidden; width: 110px; transition: all 0.2s; }
+  .item-chip:hover { border-color: rgba(212,160,23,0.35); transform: scale(1.03); }
+  .item-chip img { width: 100%; height: 72px; object-fit: cover; display: block; }
+  .item-chip-info { padding: 6px 8px; }
+  .item-chip-name { font-size: 0.72rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-chip-price { font-size: 0.65rem; color: var(--gold); }
+
+  /* TOTALS & SPECIAL */
+  .order-footer-info { padding: 14px 20px 0; display: flex; justify-content: space-between; align-items: flex-end; }
+  .order-total { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, var(--gold), var(--orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .total-label { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .special-note { font-size: 0.72rem; color: var(--orange); max-width: 180px; text-align: right; font-style: italic; }
+
+  /* ACTION BUTTONS */
+  .card-actions { display: flex; gap: 0; padding: 16px 20px 20px; }
+  .action-btn { flex: 1; padding: 11px 8px; border: none; font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .approve-btn { background: rgba(46,204,113,0.1); color: var(--green); border: 1px solid rgba(46,204,113,0.25); border-right: none; }
+  .approve-btn:hover { background: var(--green); color: var(--deep); }
+  .reject-btn { background: rgba(231,76,60,0.1); color: var(--red); border: 1px solid rgba(231,76,60,0.25); }
+  .reject-btn:hover { background: var(--red); color: white; }
+  .status-cycle-btn { flex: 1; padding: 11px 8px; background: rgba(52,152,219,0.1); color: var(--blue); border: 1px solid rgba(52,152,219,0.25); font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.25s; }
+  .status-cycle-btn:hover { background: var(--blue); color: white; }
+  .done-label { flex: 1; padding: 11px 8px; background: rgba(255,255,255,0.04); color: var(--muted); text-align: center; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--border); }
+  .return-btn { flex: 1; padding: 11px 8px; background: rgba(231,76,60,0.1); color: var(--red); border: 1px solid rgba(231,76,60,0.25); font-family: 'Rajdhani', sans-serif; font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: all 0.25s; }
+  .return-btn:hover { background: var(--red); color: white; }
+
+  /* EMPTY STATE */
+  .empty-state { grid-column: 1/-1; text-align: center; padding: 80px 40px; color: var(--muted); }
+  .empty-state .emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; opacity: 0.4; }
+  .empty-state p { font-size: 0.88rem; letter-spacing: 1px; }
+
+  /* LOADING SKELETON */
+  .skeleton { background: linear-gradient(90deg, var(--card) 25%, rgba(212,160,23,0.05) 50%, var(--card) 75%); background-size: 400%; animation: shimmer 1.4s linear infinite; }
+  @keyframes shimmer { 0% { background-position: 100%; } 100% { background-position: -100%; } }
+
+  /* TOAST */
+  #toastBox { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 9998; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .toast { padding: 11px 26px; background: rgba(17,14,9,0.96); font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; border: 1px solid var(--border); animation: toastIn 0.35s cubic-bezier(0.16,1,0.3,1); white-space: nowrap; }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--red); color: var(--red); }
+  .toast.info { border-color: var(--gold); color: var(--gold); }
+  @keyframes toastIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  /* DETAIL MODAL */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 800; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+  .modal-bg.open { display: flex; }
+  .modal-inner { background: var(--card); border: 1px solid var(--border); width: 600px; max-width: 96vw; max-height: 90vh; overflow-y: auto; animation: modalIn 0.4s cubic-bezier(0.16,1,0.3,1); }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.93) translateY(16px); } to { opacity:1; transform:scale(1) translateY(0); } }
+  .modal-inner::-webkit-scrollbar { width: 3px; }
+  .modal-inner::-webkit-scrollbar-thumb { background: var(--gold); }
+  .modal-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+  .modal-close { background: none; border: 1px solid var(--border); color: var(--muted); width: 34px; height: 34px; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
+  .modal-close:hover { border-color: var(--gold); color: var(--gold); }
+  .modal-body { padding: 24px 28px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .detail-item label { font-size: 0.6rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+  .detail-item span { font-size: 0.92rem; font-weight: 600; }
+  .modal-items-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .modal-item { background: var(--card2); border: 1px solid var(--border); overflow: hidden; }
+  .modal-item img { width: 100%; height: 90px; object-fit: cover; }
+  .modal-item-info { padding: 8px 10px; }
+  .modal-item-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; }
+  .modal-item-price { font-size: 0.72rem; color: var(--gold); }
+
+  @media (max-width: 768px) {
+    main { padding: 20px 16px; }
+    nav { padding: 14px 16px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .orders-grid { grid-template-columns: 1fr; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .modal-items-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<div id="authGuard">
+  <div class="auth-spinner"></div>
+  <div class="auth-text">Verifying access…</div>
+</div>
+
+<div id="appShell" style="display:none">
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">SAFFRON</span>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div>Live Feed</div>
+    <div class="nav-user">Logged in as <span id="navEmail">—</span></div>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<main>
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="tag">Real-time Dashboard</div>
+    <h1>Order <em>Management</em></h1>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value" id="sTotal">0</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card green"><div class="stat-label">Approved</div><div class="stat-value" id="sApproved">0</div><div class="stat-sub">Confirmed</div></div>
+    <div class="stat-card red"><div class="stat-label">Rejected / Returned</div><div class="stat-value" id="sRejected">0</div><div class="stat-sub">Declined or returned</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" id="sPending">0</div><div class="stat-sub">Awaiting action</div></div>
+    <div class="stat-card blue"><div class="stat-label">Revenue</div><div class="stat-value" id="sRevenue">₹0</div><div class="stat-sub">Approved orders</div></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-tabs">
+    <button class="ftab active" data-filter="all" onclick="setFilter('all',this)">All <span class="ftab-count" id="cAll">0</span></button>
+    <button class="ftab" data-filter="new" onclick="setFilter('new',this)">New <span class="ftab-count" id="cNew">0</span></button>
+    <button class="ftab" data-filter="approved" onclick="setFilter('approved',this)">Approved <span class="ftab-count" id="cApproved">0</span></button>
+    <button class="ftab" data-filter="preparing" onclick="setFilter('preparing',this)">Preparing <span class="ftab-count" id="cPreparing">0</span></button>
+    <button class="ftab" data-filter="ready" onclick="setFilter('ready',this)">Ready <span class="ftab-count" id="cReady">0</span></button>
+    <button class="ftab" data-filter="rejected" onclick="setFilter('rejected',this)">Rejected <span class="ftab-count" id="cRejected">0</span></button>
+    <button class="ftab" data-filter="delivered" onclick="setFilter('delivered',this)">Delivered <span class="ftab-count" id="cDelivered">0</span></button>
+    <button class="ftab" data-filter="returned" onclick="setFilter('returned',this)">Returned <span class="ftab-count" id="cReturned">0</span></button>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="orders-header">
+    <h2>Live Orders</h2>
+    <button class="refresh-btn" onclick="renderOrders()">↻ Refresh</button>
+  </div>
+  <div class="orders-grid" id="ordersGrid">
+    <div class="empty-state"><span class="emoji">📋</span><p>Listening for orders…</p></div>
+  </div>
+</main>
+
+</div><!-- end appShell -->
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-bg" id="detailModal">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h3 id="modalTitle">Order Details</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, onValue, update, remove, serverTimestamp, set, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB5lK3edUOatl-NWKoylSgk46XP7NyoJUs",
+    authDomain: "food-c7abc.firebaseapp.com",
+    databaseURL: "https://food-c7abc-default-rtdb.firebaseio.com",
+    projectId: "food-c7abc",
+    storageBucket: "food-c7abc.firebasestorage.app",
+    messagingSenderId: "556941373763",
+    appId: "1:556941373763:web:a5a1f73de91770ff017ff6",
+    measurementId: "G-EEXNEVS1SH"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  let allOrders = {};
+  let currentFilter = 'all';
+  let isFirstLoad = true;
+
+  // ---- AUTH GUARD ----
+  onAuthStateChanged(auth, (user) => {
+    document.getElementById('authGuard').style.display = 'none';
+    if (!user) {
+      window.location.href = 'manager.html';
+      return;
+    }
+    document.getElementById('appShell').style.display = 'block';
+    document.getElementById('navEmail').textContent = user.email;
+    listenOrders();
+  });
+
+  // ---- REALTIME LISTEN ----
+  function listenOrders() {
+    const ordersRef = ref(db, 'orders');
+    onValue(ordersRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      const prevKeys = Object.keys(allOrders);
+      allOrders = data;
+      const newKeys = Object.keys(data);
+      // Flash new orders
+      if (!isFirstLoad) {
+        newKeys.forEach(k => {
+          if (!prevKeys.includes(k)) {
+            showToast('🔔 New order received!', 'success');
+            playBeep();
+          }
+        });
+      }
+      isFirstLoad = false;
+      window.allOrders = allOrders;
+      renderOrders();
+      updateStats();
+    });
+  }
+
+  // ---- RENDER ORDERS ----
+  window.renderOrders = function(filter) {
+    if (filter !== undefined) currentFilter = filter;
+    const grid = document.getElementById('ordersGrid');
+    let orders = Object.entries(allOrders).map(([k, v]) => ({ ...v, _key: k }));
+    orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    if (currentFilter !== 'all') {
+      orders = orders.filter(o => o.status === currentFilter);
+    }
+
+    if (!orders.length) {
+      grid.innerHTML = `<div class="empty-state"><span class="emoji">📋</span><p>No orders${currentFilter !== 'all' ? ' with status "' + currentFilter + '"' : ''} yet.</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = orders.map(o => buildCard(o)).join('');
+  };
+
+  window.setFilter = function(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderOrders();
+  };
+
+  function buildCard(o) {
+    const statusPill = {
+      new: '<span class="status-pill pill-new">🆕 New</span>',
+      approved: '<span class="status-pill pill-approved">✅ Approved</span>',
+      rejected: '<span class="status-pill pill-rejected">❌ Rejected</span>',
+      preparing: '<span class="status-pill pill-preparing">🍳 Preparing</span>',
+      ready: '<span class="status-pill pill-ready">🔔 Ready</span>',
+      delivered: '<span class="status-pill pill-delivered">✔ Delivered</span>',
+      returned: '<span class="status-pill pill-returned">↩ Returned</span>',
+    }[o.status] || '<span class="status-pill pill-new">New</span>';
+
+    const itemChips = (o.items || []).map(it => `
+      <div class="item-chip">
+        <img src="${it.img || 'https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=200&q=60'}" alt="${it.name}" loading="lazy">
+        <div class="item-chip-info">
+          <div class="item-chip-name">${it.name}</div>
+          <div class="item-chip-price">₹${it.price} × ${it.qty}</div>
+        </div>
+      </div>`).join('');
+
+    const initials = (o.name || 'G').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const typeLabel = { 'dine-in': '🍽 Dine-In', 'takeaway': '📦 Takeaway', 'delivery': '🛵 Delivery' }[o.orderType] || o.orderType;
+
+    let actions = '';
+    if (o.status === 'new') {
+      actions = `
+        <div class="card-actions">
+          <button class="action-btn approve-btn" onclick="approveOrder('${o._key}')">✅ Approve</button>
+          <button class="action-btn reject-btn" onclick="rejectOrder('${o._key}')">❌ Reject</button>
+        </div>`;
+    } else if (o.status === 'approved') {
+      actions = `<div class="card-actions"><button class="action-btn status-cycle-btn" onclick="setStatus('${o._key}','preparing')">🍳 Mark Preparing</button></div>`;
+    } else if (o.status === 'preparing') {
+      actions = `<div class="card-actions"><button class="action-btn status-cycle-btn" onclick="setStatus('${o._key}','ready')">🔔 Mark Ready</button></div>`;
+    } else if (o.status === 'ready') {
+      actions = `<div class="card-actions"><button class="action-btn status-cycle-btn" onclick="setStatus('${o._key}','delivered')">🚚 Mark Delivered</button></div>`;
+    } else if (o.status === 'delivered') {
+      actions = `<div class="card-actions"><span class="done-label" style="flex:0 0 auto;padding:11px 14px">✔ Completed</span><button class="action-btn return-btn" onclick="returnOrder('${o._key}')">↩ Mark Returned</button></div>`;
+    } else {
+      actions = `<div class="card-actions"><span class="done-label">${o.status === 'rejected' ? '❌ Order Rejected' : '↩ Order Returned'}</span></div>`;
+    }
+
+    return `<div class="order-card status-${o.status}" id="card-${o._key}">
+      <div class="card-head">
+        <span class="order-id" onclick="openDetail('${o._key}')" style="cursor:pointer">#${o.orderId || o._key.slice(-6).toUpperCase()}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="order-time">${o.time || ''}</span>
+          ${statusPill}
+        </div>
+      </div>
+
+      <div class="customer-row">
+        <div class="customer-avatar">${initials}</div>
+        <div class="customer-info">
+          <div class="customer-name">${o.name || 'Guest'}</div>
+          <div class="customer-meta">
+            <span>📞 ${o.phone || '—'}</span>
+            <span class="order-type-badge">${typeLabel}</span>
+            ${o.orderType === 'dine-in' ? `<span>🪑 ${o.table || '—'}</span>` : ''}
+            ${o.orderType === 'delivery' ? `<span>📍 ${(o.address || '').slice(0,30)}…</span>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div class="items-section">
+        <div class="items-label">Ordered Items</div>
+        <div class="items-scroll">${itemChips}</div>
+      </div>
+
+      <div class="order-footer-info">
+        <div>
+          <div class="total-label">Order Total</div>
+          <div class="order-total">₹${o.total || 0}</div>
+        </div>
+        ${o.special ? `<div class="special-note">📝 "${o.special}"</div>` : ''}
+      </div>
+
+      ${actions}
+    </div>`;
+  }
+
+  // ---- ACTIONS (all write straight to the Realtime Database so index.html,
+  // manager.html and this dashboard always agree on order status) ----
+  window.approveOrder = async function(key) {
+    try {
+      await update(ref(db, `orders/${key}`), { status: 'approved', approvedAt: Date.now() });
+      showToast('Order confirmed!', 'success');
+    } catch(e) {
+      console.error(e);
+      showToast('Failed to confirm order — check connection', 'error');
+    }
+  };
+
+  window.rejectOrder = async function(key) {
+    try {
+      await update(ref(db, `orders/${key}`), { status: 'rejected', rejectedAt: Date.now() });
+      showToast('Order rejected.', 'error');
+    } catch(e) {
+      console.error(e);
+      showToast('Failed to reject order — check connection', 'error');
+    }
+  };
+
+  window.setStatus = async function(key, status) {
+    try {
+      await update(ref(db, `orders/${key}`), { status, updatedAt: Date.now() });
+      showToast('Status updated: ' + status, 'info');
+    } catch(e) {
+      console.error(e);
+      showToast('Failed to update status — check connection', 'error');
+    }
+  };
+
+  window.returnOrder = async function(key) {
+    try {
+      await update(ref(db, `orders/${key}`), { status: 'returned', returnedAt: Date.now() });
+      showToast('Order marked as returned.', 'info');
+    } catch(e) {
+      console.error(e);
+      showToast('Failed to mark returned — check connection', 'error');
+    }
+  };
+
+  // ---- STATS ----
+  function updateStats() {
+    const orders = Object.values(allOrders);
+    const counts = { new: 0, approved: 0, rejected: 0, preparing: 0, ready: 0, delivered: 0, returned: 0 };
+    let revenue = 0;
+    orders.forEach(o => {
+      counts[o.status] = (counts[o.status] || 0) + 1;
+      if (o.status !== 'rejected' && o.status !== 'returned') revenue += (o.total || 0);
+    });
+    document.getElementById('sTotal').textContent = orders.length;
+    document.getElementById('sApproved').textContent = (counts.approved || 0) + (counts.preparing || 0) + (counts.ready || 0) + (counts.delivered || 0);
+    document.getElementById('sRejected').textContent = (counts.rejected || 0) + (counts.returned || 0);
+    document.getElementById('sPending').textContent = counts.new || 0;
+    document.getElementById('sRevenue').textContent = '₹' + revenue.toLocaleString();
+    // Tab counts
+    document.getElementById('cAll').textContent = orders.length;
+    document.getElementById('cNew').textContent = counts.new || 0;
+    document.getElementById('cApproved').textContent = counts.approved || 0;
+    document.getElementById('cPreparing').textContent = counts.preparing || 0;
+    document.getElementById('cReady').textContent = counts.ready || 0;
+    document.getElementById('cRejected').textContent = counts.rejected || 0;
+    document.getElementById('cDelivered').textContent = counts.delivered || 0;
+    document.getElementById('cReturned').textContent = counts.returned || 0;
+  }
+
+  // ---- DETAIL MODAL ----
+  window.openDetail = function(key) {
+    const o = allOrders[key];
+    if (!o) return;
+    document.getElementById('modalTitle').textContent = 'Order #' + (o.orderId || key.slice(-6).toUpperCase());
+    document.getElementById('modalBody').innerHTML = `
+      <div class="detail-grid">
+        <div class="detail-item"><label>Customer</label><span>${o.name || '—'}</span></div>
+        <div class="detail-item"><label>Phone</label><span>${o.phone || '—'}</span></div>
+        <div class="detail-item"><label>Order Type</label><span style="text-transform:capitalize">${o.orderType || '—'}</span></div>
+        <div class="detail-item"><label>Table</label><span>${o.table || '—'}</span></div>
+        <div class="detail-item"><label>Time</label><span>${o.time || '—'}</span></div>
+        <div class="detail-item"><label>Status</label><span style="color:var(--gold);text-transform:capitalize">${o.status}</span></div>
+        ${o.address ? `<div class="detail-item" style="grid-column:1/-1"><label>Delivery Address</label><span>${o.address}</span></div>` : ''}
+        ${o.special ? `<div class="detail-item" style="grid-column:1/-1"><label>Special Instructions</label><span style="color:var(--orange)">${o.special}</span></div>` : ''}
+      </div>
+      <div class="items-label" style="margin-bottom:10px">Items Ordered</div>
+      <div class="modal-items-grid">
+        ${(o.items || []).map(it => `
+          <div class="modal-item">
+            <img src="${it.img || ''}" alt="${it.name}" loading="lazy">
+            <div class="modal-item-info">
+              <div class="modal-item-name">${it.name}</div>
+              <div class="modal-item-price">₹${it.price} × ${it.qty} = ₹${it.price * it.qty}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border)">
+        <span style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Order Total</span>
+        <span style="font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent">₹${o.total || 0}</span>
+      </div>`;
+    document.getElementById('detailModal').classList.add('open');
+  };
+  window.closeModal = () => document.getElementById('detailModal').classList.remove('open');
+
+  // ---- LOGOUT ----
+  window.doLogout = async function() {
+    await signOut(auth);
+    window.location.href = 'manager.html';
+  };
+
+  // ---- SOUND ----
+  function playBeep() {
+    try {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.start(); osc.stop(ctx.currentTime + 0.6);
+    } catch(e) {}
+  }
+</script>
+
+<script>
+// TOAST
+window.showToast = function(msg, type='info') {
+  const box = document.getElementById('toastBox');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  box.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 2400);
+  setTimeout(() => t.remove(), 2700);
+};
+
+// Close modal on bg click
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
