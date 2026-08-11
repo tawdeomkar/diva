@@ -605,109 +605,6 @@
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
-  /* MANAGER PAGE */
-  #manager {
-    min-height: 100vh;
-    background: linear-gradient(180deg, #0a0705 0%, #080604 100%);
-  }
-  .manager-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 48px;
-  }
-  .manager-stats {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 20px; margin-bottom: 48px;
-  }
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 24px;
-    position: relative; overflow: hidden;
-    transition: all 0.3s;
-  }
-  .stat-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: linear-gradient(180deg, var(--gold), var(--orange));
-  }
-  .stat-card:hover { border-color: rgba(212,160,23,0.3); transform: translateY(-3px); }
-  .stat-label {
-    font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 8px;
-  }
-  .stat-value {
-    font-size: 2rem; font-weight: 700;
-    background: linear-gradient(135deg, var(--gold), var(--orange));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .stat-sub { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
-  .orders-table-wrap {
-    background: var(--card);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .orders-table-head {
-    padding: 20px 28px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .orders-table-head h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-  }
-  .live-badge {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--green);
-  }
-  .live-dot {
-    width: 8px; height: 8px;
-    background: var(--green); border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(46,204,113,0); }
-  }
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--muted); padding: 14px 28px; text-align: left;
-    border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,0.02);
-  }
-  td {
-    padding: 16px 28px; border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-size: 0.88rem;
-    transition: background 0.2s;
-  }
-  tr:hover td { background: rgba(212,160,23,0.04); }
-  tr.new-order td { background: rgba(46,204,113,0.06); animation: rowFlash 1s ease; }
-  @keyframes rowFlash {
-    0%, 100% { background: rgba(46,204,113,0.06); }
-    50% { background: rgba(46,204,113,0.15); }
-  }
-  .status-badge {
-    padding: 4px 12px;
-    font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase;
-    font-weight: 700; display: inline-block;
-  }
-  .status-new { background: rgba(46,204,113,0.15); color: var(--green); }
-  .status-preparing { background: rgba(255,165,0,0.15); color: orange; }
-  .status-ready { background: rgba(52,152,219,0.15); color: #3498db; }
-  .status-delivered { background: rgba(255,255,255,0.08); color: var(--muted); }
-  .status-btn {
-    padding: 5px 12px;
-    background: none; border: 1px solid var(--border);
-    color: var(--muted); font-size: 0.68rem; letter-spacing: 1.5px;
-    text-transform: uppercase; cursor: none;
-    transition: all 0.2s; font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
-  }
-  .status-btn:hover { border-color: var(--gold); color: var(--gold); }
-
   /* FLOATING PARTICLES */
   .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
   .particle {
@@ -789,10 +686,8 @@
     nav { padding: 16px 20px; }
     .nav-links { display: none; }
     section { padding: 80px 20px; }
-    .manager-stats { grid-template-columns: 1fr 1fr; }
     #about { grid-template-columns: 1fr; }
     .about-img-wrap { height: 300px; }
-    table { display: block; overflow-x: auto; }
     footer { flex-direction: column; text-align: center; }
   }
 
@@ -833,24 +728,6 @@
     to { opacity: 0; transform: translateY(20px); }
   }
 
-  /* MANAGER LOGIN */
-  .manager-login {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  }
-  .login-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 48px; width: 360px;
-    text-align: center;
-    animation: modalIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
-  }
-  .login-box h2 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.2rem; letter-spacing: 3px;
-    color: var(--gold); margin-bottom: 8px;
-  }
-  .login-box p { color: var(--muted); font-size: 0.8rem; margin-bottom: 32px; }
-  .login-box .form-group { text-align: left; }
 </style>
 </head>
 <body>
@@ -869,7 +746,7 @@
     <li><a href="#" onclick="showPage('home');scrollTo('hero')" class="active" data-page="home">Home</a></li>
     <li><a href="#" onclick="showPage('home');scrollTo('menu')">Menu</a></li>
     <li><a href="#" onclick="showPage('home');scrollTo('about')">About</a></li>
-    <li><a href="#" onclick="showPage('manager')" data-page="manager">Manager</a></li>
+    <li><a href="manager.html">Manager</a></li>
   </ul>
   <button class="nav-cart" onclick="toggleCart()">
     🛒 Cart
@@ -948,76 +825,6 @@
   </footer>
 
 </div><!-- end page-home -->
-
-<!-- ===== MANAGER PAGE ===== -->
-<div class="page" id="page-manager">
-  <div id="managerLoginWrap" class="manager-login">
-    <div class="login-box">
-      <h2>MANAGER PORTAL</h2>
-      <p>Authorized access only</p>
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="loginUser" placeholder="manager">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••">
-      </div>
-      <button class="btn-primary" style="width:100%;margin-top:12px" onclick="managerLogin()">Access Dashboard</button>
-    </div>
-  </div>
-  <div id="managerDashboard" style="display:none">
-    <section style="padding:120px 48px 60px">
-      <div class="manager-header">
-        <div>
-          <div class="section-label">Live Dashboard</div>
-          <h2 class="section-title" style="margin-bottom:0">Order <em>Management</em></h2>
-        </div>
-        <div style="display:flex;gap:12px">
-          <button class="btn-outline" onclick="clearAllOrders()">Clear All</button>
-          <button class="btn-primary" onclick="managerLogout()">Logout</button>
-        </div>
-      </div>
-
-      <div class="manager-stats" id="managerStats">
-        <div class="stat-card reveal">
-          <div class="stat-label">Total Orders</div>
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-sub">All time</div>
-        </div>
-        <div class="stat-card reveal">
-          <div class="stat-label">Pending</div>
-          <div class="stat-value" id="statPending" style="background:linear-gradient(135deg,orange,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent">0</div>
-          <div class="stat-sub">Awaiting preparation</div>
-        </div>
-        <div class="stat-card reveal">
-          <div class="stat-label">Revenue</div>
-          <div class="stat-value" id="statRevenue">₹0</div>
-          <div class="stat-sub">Today's total</div>
-        </div>
-        <div class="stat-card reveal">
-          <div class="stat-label">Avg Order</div>
-          <div class="stat-value" id="statAvg">₹0</div>
-          <div class="stat-sub">Per order</div>
-        </div>
-      </div>
-
-      <div class="orders-table-wrap reveal">
-        <div class="orders-table-head">
-          <h3>Live Orders</h3>
-          <div class="live-badge"><div class="live-dot"></div>Real-time</div>
-        </div>
-        <div id="ordersTableBody">
-          <div style="padding:48px;text-align:center;color:var(--muted)">
-            <p style="font-size:2rem;margin-bottom:12px">📋</p>
-            <p>No orders yet. Orders will appear here in real-time.</p>
-          </div>
-        </div>
-      </div>
-
-    </section>
-  </div>
-</div><!-- end page-manager -->
 
 <!-- CART OVERLAY -->
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
@@ -1117,6 +924,34 @@
   <button class="btn-primary" style="margin-top:20px" onclick="closeSuccess()">Continue Browsing</button>
 </div>
 
+<!-- Firebase (writes incoming orders to Realtime Database for the Manager Dashboard) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB5lK3edUOatl-NWKoylSgk46XP7NyoJUs",
+    authDomain: "food-c7abc.firebaseapp.com",
+    databaseURL: "https://food-c7abc-default-rtdb.firebaseio.com",
+    projectId: "food-c7abc",
+    storageBucket: "food-c7abc.firebasestorage.app",
+    messagingSenderId: "556941373763",
+    appId: "1:556941373763:web:4bcdfcb397f8d8f3017ff6",
+    measurementId: "G-E02X9Z7W9E"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Called from placeOrder() below — writes the order to /orders so it shows
+  // up live on the Manager Dashboard (dashboard.html).
+  window._fbPush = async function (orderData) {
+    const newRef = push(ref(db, 'orders'));
+    await set(newRef, { ...orderData, serverCreatedAt: serverTimestamp() });
+    return newRef.key;
+  };
+</script>
+
 <script>
 // ===== MENU DATA =====
 const menuItems = [
@@ -1139,7 +974,6 @@ const menuItems = [
 ];
 
 let cart = [];
-let orders = JSON.parse(localStorage.getItem('saffron_orders') || '[]');
 let currentFilter = 'all';
 let orderIdCounter = parseInt(localStorage.getItem('saffron_order_counter') || '1000');
 
@@ -1374,101 +1208,6 @@ function spawnConfetti() {
     c.appendChild(el);
   }
 }
-
-// ===== MANAGER =====
-function managerLogin() {
-  const u = document.getElementById('loginUser').value;
-  const p = document.getElementById('loginPass').value;
-  if (u === 'manager' && p === 'saffron123') {
-    document.getElementById('managerLoginWrap').style.display = 'none';
-    document.getElementById('managerDashboard').style.display = 'block';
-    refreshManagerDashboard();
-  } else {
-    showToast('Invalid credentials');
-    document.getElementById('loginPass').value = '';
-  }
-}
-function managerLogout() {
-  document.getElementById('managerLoginWrap').style.display = 'flex';
-  document.getElementById('managerDashboard').style.display = 'none';
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-}
-function clearAllOrders() {
-  if (confirm('Clear all orders?')) {
-    orders = [];
-    localStorage.setItem('saffron_orders', JSON.stringify(orders));
-    refreshManagerDashboard();
-  }
-}
-function updateOrderStatus(id, newStatus) {
-  const order = orders.find(o => o.id === id);
-  if (order) {
-    order.status = newStatus;
-    localStorage.setItem('saffron_orders', JSON.stringify(orders));
-    refreshManagerDashboard();
-  }
-}
-function refreshManagerDashboard() {
-  orders = JSON.parse(localStorage.getItem('saffron_orders') || '[]');
-  const total = orders.length;
-  const pending = orders.filter(o => o.status === 'new' || o.status === 'preparing').length;
-  const revenue = orders.reduce((s, o) => s + o.total, 0);
-  const avg = total ? Math.round(revenue / total) : 0;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statPending').textContent = pending;
-  document.getElementById('statRevenue').textContent = '₹' + revenue.toLocaleString();
-  document.getElementById('statAvg').textContent = '₹' + avg;
-
-  const body = document.getElementById('ordersTableBody');
-  if (!orders.length) {
-    body.innerHTML = `<div style="padding:48px;text-align:center;color:var(--muted)"><p style="font-size:2rem;margin-bottom:12px">📋</p><p>No orders yet. Orders will appear here in real-time.</p></div>`;
-    return;
-  }
-  const statusCycle = { new: 'preparing', preparing: 'ready', ready: 'delivered', delivered: 'new' };
-  const statusLabels = { new: 'New', preparing: 'Preparing', ready: 'Ready', delivered: 'Delivered' };
-  body.innerHTML = `<table>
-    <thead>
-      <tr>
-        <th>Order ID</th><th>Customer</th><th>Type</th><th>Table</th><th>Items</th><th>Total</th><th>Time</th><th>Status</th><th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${orders.map(o => `
-        <tr class="${o.status === 'new' ? 'new-order' : ''}">
-          <td style="color:var(--gold);font-weight:700">#${o.id}</td>
-          <td>
-            <div style="font-weight:600">${o.name}</div>
-            <div style="font-size:0.75rem;color:var(--muted)">${o.phone}</div>
-          </td>
-          <td style="text-transform:capitalize">${o.type}</td>
-          <td>${o.table}</td>
-          <td>
-            <div style="font-size:0.82rem;color:var(--muted);max-width:200px">
-              ${o.items.map(i => `${i.name}×${i.qty}`).join(', ')}
-            </div>
-            ${o.special ? `<div style="font-size:0.72rem;color:var(--orange);margin-top:3px">📝 ${o.special}</div>` : ''}
-          </td>
-          <td style="color:var(--gold);font-weight:700">₹${o.total}</td>
-          <td style="font-size:0.78rem;color:var(--muted)">${o.time}</td>
-          <td><span class="status-badge status-${o.status}">${statusLabels[o.status]}</span></td>
-          <td>
-            <button class="status-btn" onclick="updateOrderStatus(${o.id},'${statusCycle[o.status]}')">
-              ${statusCycle[o.status].charAt(0).toUpperCase()+statusCycle[o.status].slice(1)} →
-            </button>
-          </td>
-        </tr>`).join('')}
-    </tbody>
-  </table>`;
-}
-
-// Refresh manager dashboard every 5 seconds if on manager page
-setInterval(() => {
-  if (document.getElementById('page-manager').classList.contains('active') &&
-      document.getElementById('managerDashboard').style.display !== 'none') {
-    refreshManagerDashboard();
-  }
-}, 5000);
 
 // ===== PAGE NAVIGATION =====
 function showPage(page) {
